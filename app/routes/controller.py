@@ -15,6 +15,9 @@ from model.rest import NuevoProspectoRequest,NuevoProspectoResponse
 from model.rest import LoginRequest,LoginResponse
 from model.rest import CodigoResponse
 import pdb
+from routes.validator import EmailValidator
+
+validation_email = EmailValidator("email")
 
 ################################################################################
 ### En app/model/rest.py se definen los modelos que servirán para comunicarse
@@ -122,5 +125,13 @@ async def login_email(data: LoginRequest) -> LoginResponse:
     return LoginResponse(
         estatus = 200,
         mensaje = "Listo, ingresaste a la APP :)"
+    )
+
+@router.post("/validar-email/{email}", response_model = LoginResponse, dependencies=[Depends(validation_email)])
+async def valida_email(email: str) -> LoginResponse:
+    #handler.login_email_model(data)
+    return LoginResponse(
+        estatus = 200,
+        mensaje = "Listo, se valido el email :)"
     )
 

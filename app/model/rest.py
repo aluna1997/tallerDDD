@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import date,datetime
+from services.constants import REGEX_EMAIL
 
 ################################################################################
 ### Clases que se reciben
@@ -54,8 +55,8 @@ class CodigoResponse(BaseModel):
 
 #### LOGIN ####
 class LoginRequest(BaseModel):
-    email: str
-    codigo: str
+    email: Optional[str] = Field(None, title="email", description="El email del usuario que quiere ingresar al APP")
+    codigo: Optional[str] = Field(None, title="codigo",description="El código que el usuario generó para ingresar al APP")
 
 class LoginResponse(BaseModel):
     estatus: int

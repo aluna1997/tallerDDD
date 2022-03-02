@@ -26,8 +26,10 @@ from model.rest import NuevoProspectoRequest
 from model.rest import LoginRequest
 from model.domain.tbl_login_model import TblLoginModel
 
+# Constantes
+from services.constants import SOLICITUD_EN_PROCESO
+
 HTTP_SESSION = requests.Session()
-SOLICITUD_EN_PROCESO = 1
 
 def probar_http_session(token: str, num_cta:str) -> TestResponse:
     head = {"Authorization": f"Bearer {token}", "Content-Type":"application/json"}
@@ -160,11 +162,11 @@ def login_email_model(data: LoginRequest) -> Any:
         with CodigoUnitOfWork() as uow:
             email_obj = uow.email_repository.obtener_id_email(data.email)
             if not email_obj:
-                raise EntityNotFoundException
+                raise EntityNotFoundException("No se econtró el email")
 
             codigo_obj = uow.login_repository.obtener_codigo(data.codigo,email_obj.IdEmail)
             if not codigo_obj:
-                raise EntityNotFoundException
+                raise EntityNotFoundException("No se encontró el código")
             
             codigo_obj.FechaAcceso = datetime.now()
             codigo_obj.VecesLogin += 1
@@ -175,8 +177,8 @@ def login_email_model(data: LoginRequest) -> Any:
     except EntityNotFoundException as exc:
         logger.exception(exc)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(exc),
+            status_code = 404,
+            detail = str(exc),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
